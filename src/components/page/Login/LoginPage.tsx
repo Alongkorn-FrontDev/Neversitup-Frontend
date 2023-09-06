@@ -15,7 +15,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup'; // you will have to install yup
 import { yupResolver } from '@hookform/resolvers/yup'; // you will have to install @hookform/resolvers
-import axios from "axios";
 
 
 function Copyright(props: string) {
@@ -45,58 +44,23 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
 
-  const { register, handleSubmit, reset, formState:{ errors } } = useForm({
+  const { register, handleSubmit, formState:{ errors } } = useForm({
     resolver: yupResolver(SignupSchema)
   });
 
-  const onSubmitHandler = async (value) => {
-    console.log({ value });
-
-    const email = value.email;
-    const password = value.password
-
-    let data = JSON.stringify({
-      "username": email, 
-      "password": password
-    });
-
-    console.log(data);
-    
-    await axios({
-      method: "post",
-      url: 'https://candidate.neversitup.com/todo/users/auth',
-      headers: {
-        // 'Authorization': "Basic " + Config.encoded,
-        "Content-Type": "application/json",
-      },
-      data: data,
-    })
-      .then((res) => {
-        console.log(JSON.stringify(res.data));
-        // then print response status
-        if (res) {
-          localStorage.setItem('accessToken', res.data.token);
-          localStorage.setItem('user', JSON.stringify(res.data.token));
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error) {
-          alert(error.message);
-        }
-      });
-
+  const onSubmitHandler = (data) => {
+    console.log({ data });
     reset();
   };
 
-  // const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   const data = new FormData(event.currentTarget);
-  //   console.log({
-  //     email: data.get('email'),
-  //     password: data.get('password'),
-  //   });
-  // };
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    console.log({
+      email: data.get('email'),
+      password: data.get('password'),
+    });
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -116,7 +80,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit(onSubmitHandler)} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
