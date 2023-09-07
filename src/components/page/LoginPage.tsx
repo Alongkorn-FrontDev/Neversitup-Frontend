@@ -3,10 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
@@ -16,14 +13,14 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup'; // you will have to install yup
 import { yupResolver } from '@hookform/resolvers/yup'; // you will have to install @hookform/resolvers
 import axios from "axios";
-
+import swal from 'sweetalert';
 
 function Copyright(props: string) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="#">
+        Alongkorn Website
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -75,14 +72,20 @@ export default function SignIn() {
         console.log(JSON.stringify(res.data));
         // then print response status
         if (res) {
+          // swal("Success", res.data, "success", {
+          //   buttons: false,
+          //   timer: 2000,
+          // })
           localStorage.setItem('accessToken', res.data.token);
           localStorage.setItem('user', JSON.stringify(res.data.token));
+          window.location.href = "/todo";
         }
       })
       .catch((error) => {
         console.log(error);
         if (error) {
-          alert(error.message);
+        swal("Failed", error.message, "error");
+          // alert(error.message);
         }
       });
 
@@ -100,7 +103,7 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="md">
         <CssBaseline />
         <Box
           sx={{
@@ -108,6 +111,7 @@ export default function SignIn() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            width: '100%'
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -116,7 +120,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit(onSubmitHandler)} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit(onSubmitHandler)} noValidate sx={{ mt: 1, minWidth: '460px' }}>
             <TextField
               margin="normal"
               required
@@ -128,7 +132,9 @@ export default function SignIn() {
               autoFocus
               {...register("email")} 
             />
-            <p>{errors.email?.message}</p>
+            <div className="invalid-feedback" style={{ color: 'red', textAlign: 'left' }}>
+              {errors.email?.message}
+            </div>
             <TextField
               margin="normal"
               required
@@ -140,11 +146,7 @@ export default function SignIn() {
               autoComplete="current-password"
               {...register("password")} 
             />
-            <p>{errors.password?.message}</p>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            <div className="invalid-feedback" style={{ color: 'red', textAlign: 'left' }}>{errors.password?.message}</div>
             <Button
               type="submit"
               fullWidth
@@ -153,18 +155,6 @@ export default function SignIn() {
             >
               Sign In
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />

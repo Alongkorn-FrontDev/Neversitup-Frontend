@@ -15,14 +15,15 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup'; // you will have to install yup
 import { yupResolver } from '@hookform/resolvers/yup'; // you will have to install @hookform/resolvers
-
+import axios from "axios";
+import swal from 'sweetalert';
 
 function Copyright(props: string) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="#">
+        Alongkorn Website
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -44,27 +45,68 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
 
-  const { register, handleSubmit, formState:{ errors } } = useForm({
+  const { register, handleSubmit, reset, formState:{ errors } } = useForm({
     resolver: yupResolver(SignupSchema)
   });
 
-  const onSubmitHandler = (data) => {
-    console.log({ data });
+  const onSubmitHandler = async (value) => {
+    console.log({ value });
+
+    const email = value.email;
+    const password = value.password
+
+    let data = JSON.stringify({
+      "username": email, 
+      "password": password
+    });
+
+    console.log(data);
+    
+    await axios({
+      method: "post",
+      url: 'https://candidate.neversitup.com/todo/users/auth',
+      headers: {
+        // 'Authorization': "Basic " + Config.encoded,
+        "Content-Type": "application/json",
+      },
+      data: data,
+    })
+      .then((res) => {
+        console.log(JSON.stringify(res.data));
+        // then print response status
+        if (res) {
+          swal("Success", res.data, "success", {
+            buttons: false,
+            timer: 2000,
+          })
+          localStorage.setItem('accessToken', res.data.token);
+          localStorage.setItem('user', JSON.stringify(res.data.token));
+          window.location.href = "/todo";
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error) {
+        swal("Failed", error.message, "error");
+          // alert(error.message);
+        }
+      });
+
     reset();
   };
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+  // const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   const data = new FormData(event.currentTarget);
+  //   console.log({
+  //     email: data.get('email'),
+  //     password: data.get('password'),
+  //   });
+  // };
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="md">
         <CssBaseline />
         <Box
           sx={{
@@ -72,6 +114,7 @@ export default function SignIn() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            width: '100%'
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -80,7 +123,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit(onSubmitHandler)} noValidate sx={{ mt: 1, minWidth: '460px' }}>
             <TextField
               margin="normal"
               required
@@ -92,7 +135,9 @@ export default function SignIn() {
               autoFocus
               {...register("email")} 
             />
-            <p>{errors.email?.message}</p>
+            <div className="invalid-feedback" style={{ color: 'red', textAlign: 'left' }}>
+              {errors.email?.message}
+            </div>
             <TextField
               margin="normal"
               required
@@ -104,11 +149,7 @@ export default function SignIn() {
               autoComplete="current-password"
               {...register("password")} 
             />
-            <p>{errors.password?.message}</p>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            <div className="invalid-feedback" style={{ color: 'red', textAlign: 'left' }}>{errors.password?.message}</div>
             <Button
               type="submit"
               fullWidth
@@ -117,18 +158,6 @@ export default function SignIn() {
             >
               Sign In
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
