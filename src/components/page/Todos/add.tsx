@@ -26,7 +26,6 @@ export default function Add({onValueChange}) {
   const [open, setOpen] = React.useState(false);
 
   const token = localStorage.getItem("accessToken");
-  console.log(token);
 
   if (!token) {
     return <LoginPage />;
@@ -37,11 +36,13 @@ export default function Add({onValueChange}) {
   };
 
   const handleClose = () => {
-    setOpen(false);
     onValueChange();
+    setOpen(false);
+    reset()
+    // window.location.reload();
   };
 
-  const { register, handleSubmit , formState:{ errors } } = useForm({
+  const { register, handleSubmit, reset, formState:{ errors } } = useForm({
     resolver: yupResolver(AddToDoSchema)
   });
 
@@ -66,10 +67,12 @@ export default function Add({onValueChange}) {
       data: data,
     })
       .then((res) => {
+        swal("Good job!", "You clicked the button!", "success");
         // then print response status
         if (res) {
           console.log(res.data);
-          setOpen(false);
+          // setOpen(false);
+          handleClose();
         }
       })
       .catch((error) => {

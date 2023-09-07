@@ -145,10 +145,18 @@ export default function Edit() {
       },
       data: data,
     })
+    swal({
+      title: "Updated!",
+      text: "Thanks!",
+      icon: "success",
+      buttons: true,
+      // dangerMode: true,
+    })
       .then((res) => {
         console.log(JSON.stringify(res.data));
         // then print response status
         if (res) {
+          // swal("Good job!", "You clicked the button!", "success");
           window.location.href = "/todo";
         }
       })

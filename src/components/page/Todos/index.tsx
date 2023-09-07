@@ -1,31 +1,18 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import AppBar from "@mui/material/AppBar";
-import Button from "@mui/material/Button";
-import CameraIcon from "@mui/icons-material/PhotoCamera";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Link from "@mui/material/Link";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import FolderIcon from "@mui/icons-material/Folder";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { styled } from "@mui/material/styles";
@@ -35,7 +22,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import moment from 'moment';
 
 import LoginPage from "../LoginPage";
-import { BorderColor } from '@mui/icons-material';
 import ButtonAdd from "./add";
 
 function Copyright(props: string) {
@@ -64,6 +50,11 @@ const Demo = styled("div")(({ theme }) => ({
 export default function Todos() {
   const [data, setData] = useState([]);
 
+  // data.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+  data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+  // console.log(data);
+   
   const token = localStorage.getItem("accessToken");
 
   if (!token) {
@@ -104,6 +95,13 @@ export default function Todos() {
         "Content-Type": "application/json",
       },
     })
+    swal({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this imaginary file!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
       .then((res) => {
         // then print response status
         if (res) {
@@ -115,12 +113,14 @@ export default function Todos() {
         console.log(error);
         if (error) {
           swal("Failed", error.message, "error");
+          // fethDataTodoAll();
         }
       });
   };
 
   const handleValueChange = async () => {
-    fethDataTodoAll();
+    // alert("AEEEY");
+    fethDataTodoAll(token);
   }
 
   useEffect(() => {
@@ -166,7 +166,7 @@ export default function Todos() {
               color="text.primary"
               gutterBottom
             >
-              Alongkorn Todo List
+              Todo List
             </Typography>
             <Stack
               sx={{ pt: 4 }}
@@ -186,9 +186,11 @@ export default function Todos() {
                 <Demo>
                   <List>
                     <ListItem
+                    sx={{pr: {xs: 7, md: 9, lg: 10 }}}
                       secondaryAction={
                         <>
                         <IconButton 
+                        sx={{ display: {xs: 'block', md: 'inline-flex', lg: 'inline-flex'}}}
                         edge="center" 
                         aria-label="edit" 
                         onClick={() => {
@@ -204,7 +206,7 @@ export default function Todos() {
                       }
                     >
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: deepOrange[500] }} alt={card.title}>
+                        <Avatar sx={{ bgcolor: deepOrange[500] }} alt={card.title}  src="/">
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText

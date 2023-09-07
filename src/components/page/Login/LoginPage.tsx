@@ -75,10 +75,10 @@ export default function SignIn() {
         console.log(JSON.stringify(res.data));
         // then print response status
         if (res) {
-          swal("Success", res.data, "success", {
-            buttons: false,
-            timer: 2000,
-          })
+          // swal("Success", res.data, "success", {
+          //   buttons: false,
+          //   timer: 2000,
+          // })
           localStorage.setItem('accessToken', res.data.token);
           localStorage.setItem('user', JSON.stringify(res.data.token));
           window.location.href = "/todo";
